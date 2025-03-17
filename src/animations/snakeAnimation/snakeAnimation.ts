@@ -1,4 +1,7 @@
 import checkTimerStep from '../../engine/time/checkTimerStep'
+import { snakeBodyLocation } from './bodyAnimations/snakeBodyLocation'
+import { snakeBodyMoving } from './bodyAnimations/snakeBodyMoving'
+import { snakeBodyTurnaround } from './bodyAnimations/snakeBodyTurnaround'
 import { snakeHeadLocation } from './headAnimations/snakeHeadLocation'
 import { snakeHeadMoving } from './headAnimations/snakeHeadMoving'
 import { snakeHeadTurnaround } from './headAnimations/snakeHeadTurnaround'
@@ -20,13 +23,18 @@ export const snakeAnimation = (delta: number) => {
   }
   if (!checkTimerStep()) {
     snakeSteps = snakeStepSetting(snakeSteps)
-    snakeHeadLocation(snakeSteps, delta)
-    snakeHeadTurnaround(snakeSteps)
+    // snakeHeadLocation(snakeSteps, delta)
+    snakeBodyLocation(snakeSteps, delta)
+    // snakeHeadTurnaround(snakeSteps)
+    snakeBodyTurnaround(snakeSteps)
     snakeTailTurnaround(snakeSteps)
 
     previousStepX = snakeSteps.currentStepX
     previousStepY = snakeSteps.currentStepY
-    snakeHeadMoving(snakeSteps, delta)
+    //snakeHeadMoving(snakeSteps, delta)
+    snakeBodyMoving(snakeSteps, delta)
   }
+  // console.log(snakeSteps)
+
   return snakeSteps
 }
