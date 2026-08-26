@@ -3,14 +3,16 @@ import { signInWithEmail, signOut, signUpWithEmail } from '../services/authRepos
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabaseClient'
 import '../styles/authPanel.css'
 
-type AuthMode = 'sign-in' | 'sign-up'
+export type AuthMode = 'sign-in' | 'sign-up'
 
 type AuthPanelProps = {
   embedded?: boolean
+  mode?: AuthMode
+  onModeChange?: (mode: AuthMode) => void
 }
 
-function AuthPanel({ embedded = false }: AuthPanelProps) {
-  const [mode, setMode] = useState<AuthMode>('sign-in')
+function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: AuthPanelProps) {
+  const [localMode, setLocalMode] = useState<AuthMode>('sign-in')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -18,6 +20,12 @@ function AuthPanel({ embedded = false }: AuthPanelProps) {
   const [message, setMessage] = useState('')
   const [isBusy, setIsBusy] = useState(false)
   const isConfigured = isSupabaseConfigured()
+  const mode = controlledMode ?? localMode
+
+  function selectMode(nextMode: AuthMode) {
+    setLocalMode(nextMode)
+    onModeChange?.(nextMode)
+  }
 
   const canSubmit = useMemo(
     () => email.trim().length > 0 && password.length >= 6 && !isBusy,
@@ -124,14 +132,14 @@ function AuthPanel({ embedded = false }: AuthPanelProps) {
         <button
           className={mode === 'sign-in' ? 'auth-tab auth-tab-active' : 'auth-tab'}
           type='button'
-          onClick={() => setMode('sign-in')}
+          onClick={() => selectMode('sign-in')}
         >
           Вход
         </button>
         <button
           className={mode === 'sign-up' ? 'auth-tab auth-tab-active' : 'auth-tab'}
           type='button'
-          onClick={() => setMode('sign-up')}
+          onClick={() => selectMode('sign-up')}
         >
           Регистрация
         </button>

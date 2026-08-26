@@ -6,7 +6,7 @@
 
 - TypeScript
 - React
-- Vite
+- Next.js 14 (App Router)
 - Three.js
 - React Three Fiber
 - Drei
@@ -14,7 +14,8 @@
 
 ## Project Structure
 
-- `src/main.tsx` - application entry point and initial level startup.
+- `app/` - Next.js layout and page entry point.
+- `src/components/SnakeGame.tsx` - client-only game initialization and startup.
 - `src/components/` - React and React Three Fiber rendering components.
 - `src/assets/` - 3D model components, geometry, textures, and visual assets.
 - `src/engine/` - gameplay rules, level loading, movement, collisions, scores, lives, bonuses, obstacles, and timers.
@@ -45,11 +46,18 @@ Build production bundle:
 npm run build
 ```
 
-Preview production build:
+Start the production build:
 
 ```bash
-npm run preview
+npm run start
 ```
+
+## Environment
+
+Copy `.env.example` to `.env.local` and set:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ## Validation
 

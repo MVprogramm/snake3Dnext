@@ -69,8 +69,7 @@ const Menu = lazy(() => import('./Menu'))
 const Wrapper = lazy(() => import('./Wrapper').then((m) => ({ default: m.Wrapper })))
 const TrainingPanel = lazy(() => import('./TrainingPanel'))
 
-// ✅ в Vite используем import.meta.env.DEV
-const isDev = import.meta.env.DEV
+const isDev = process.env.NODE_ENV === 'development'
 
 const GL_SETTINGS = {
   antialias: true,
