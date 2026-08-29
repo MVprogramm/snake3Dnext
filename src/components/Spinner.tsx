@@ -1,6 +1,5 @@
 import React from 'react'
 import { Html, useProgress } from '@react-three/drei'
-import '../styles/spinner.css'
 
 const Spinner: React.FC = () => {
   const { progress } = useProgress()

@@ -1,0 +1,8 @@
+@import '../src/styles/main.css';
+@import '../src/styles/wrapper.css';
+@import '../src/styles/gameInfo.css';
+@import '../src/styles/menu.css';
+@import '../src/styles/authPanel.css';
+@import '../src/styles/sessionHistoryPanel.css';
+@import '../src/styles/trainingPanel.css';
+@import '../src/styles/spinner.css';

@@ -4,7 +4,6 @@ import {
   listGameSessions,
 } from '../services/gameSessionRepository'
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabaseClient'
-import '../styles/sessionHistoryPanel.css'
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('ru-RU', {

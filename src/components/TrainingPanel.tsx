@@ -4,7 +4,6 @@ import {
   isTrainingMode,
   setTrainingSpeed,
 } from '../engine/training/trainingMode'
-import '../styles/trainingPanel.css'
 
 const SPEEDS = [1, 2, 3, 4, 5]
 

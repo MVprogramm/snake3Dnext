@@ -1,4 +1,3 @@
-import '../styles/gameInfo.css'
 
 function GameInfo() {
   return (

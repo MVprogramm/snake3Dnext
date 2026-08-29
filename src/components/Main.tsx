@@ -59,7 +59,6 @@ import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping, SRGBColorSpace } from 'three'
 import { useMenuStore } from '../store/menuStore'
 import { cameraCONFIG } from '../config/cameraConfig'
-import '../styles/main.css'
 
 const LevaMonitor = lazy(() =>
   import('./LevaMonitor').then((m) => ({ default: m.LevaMonitor })),
@@ -68,6 +67,7 @@ const Game = lazy(() => import('./Game').then((m) => ({ default: m.Game })))
 const Menu = lazy(() => import('./Menu'))
 const Wrapper = lazy(() => import('./Wrapper').then((m) => ({ default: m.Wrapper })))
 const TrainingPanel = lazy(() => import('./TrainingPanel'))
+const HomeButton = lazy(() => import('./HomeButton'))
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -154,6 +154,12 @@ function Main() {
           <Suspense fallback={null}>
             <TrainingPanel />
           </Suspense>
+
+          {!isVisible && (
+            <Suspense fallback={null}>
+              <HomeButton />
+            </Suspense>
+          )}
 
           {isVisible && (
             <Suspense fallback={<LoadingFallback text='Loading menu...' />}>

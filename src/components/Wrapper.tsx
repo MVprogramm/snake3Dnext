@@ -5,7 +5,6 @@ import { setTouch } from '../engine/events/touchEvent'
 import keyboardEvents from '../engine/events/keyboardEvents'
 // import GameButtons from "../GameButtons/GameButtons";
 import { useMenuStore } from '../store/menuStore'
-import '../styles/wrapper.css'
 
 export function Wrapper({ children }: { children: ReactNode }) {
   const { isVisible } = useMenuStore()

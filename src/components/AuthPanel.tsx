@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { signInWithEmail, signOut, signUpWithEmail } from '../services/authRepository'
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabaseClient'
-import '../styles/authPanel.css'
 
 export type AuthMode = 'sign-in' | 'sign-up'
 
