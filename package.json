@@ -11,7 +11,7 @@
   "dependencies": {
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.17.10",
-    "@supabase/supabase-js": "^2.45.4",
+    "@supabase/supabase-js": "^2.115.0",
     "@types/three": "^0.173.0",
     "leva": "^0.10.0",
     "next": "^14.2.0",
