@@ -1,5 +1,4 @@
 import { Protocol } from '../types/protocolTypes'
-import { isTrainingMode } from '../engine/training/trainingMode'
 import { getSupabaseClient } from './supabaseClient'
 import levels from '../engine/levels/levels.json'
 
@@ -170,6 +169,7 @@ export async function saveGameSession(
     params.levelNumber,
     params.score,
   )
+  const { isTrainingMode } = await import('../engine/training/trainingMode')
   const { error } = await supabase.from('game_sessions').insert({
     user_id: userData.user.id,
     level_number: params.levelNumber,

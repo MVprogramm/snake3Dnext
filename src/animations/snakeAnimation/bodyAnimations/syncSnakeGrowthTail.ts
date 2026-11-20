@@ -1,4 +1,4 @@
-import { getField } from '../../../engine/field/fieldPerLevel'
+import { getField, getFieldRows } from '../../../engine/field/fieldPerLevel'
 import { getSnakeBodyLocation, setSnakeBodyLocation } from './snakeBodyLocation'
 import {
   getSnakeUnitPosition,
@@ -10,7 +10,7 @@ import { getDiff, setDiff } from './snakeDiff'
 
 function toSceneCoord(coord: number[]): [number, number] {
   const fieldOffset = (getField() + 1) / 2
-  return [coord[0] - fieldOffset, coord[1] - fieldOffset]
+  return [coord[0] - fieldOffset, coord[1] - (getFieldRows() + 1) / 2]
 }
 
 function syncDiff(diff: { diffX: number; diffY: number }, index: number): void {

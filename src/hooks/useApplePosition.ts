@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { getField } from '../engine/field/fieldPerLevel'
+import { toFieldScene } from '../engine/field/fieldGeometry'
 import { getFoodCoord } from '../engine/food/food'
 import { Position2D, Position3D } from '../types/threeTypes'
 
-const ROUNDING_OFFSET = 0.5
 
 const isValidCoord = (coord: unknown): coord is Position2D =>
   Array.isArray(coord) &&
@@ -14,22 +13,11 @@ const isValidCoord = (coord: unknown): coord is Position2D =>
  * Хук для управления позицией яблока
  */
 export const useApplePosition = (zLocation: number) => {
-  const fieldSize = getField()
-  const halfField = React.useMemo(() => fieldSize / 2 + 1, [fieldSize])
   const [position, setPosition] = React.useState<Position3D | null>(null)
 
-  const fastRound = React.useCallback(
-    (value: number) => (value + ROUNDING_OFFSET) | 0,
-    []
-  )
-
   const transformCoordinates = React.useCallback(
-    (coord: Position2D): Position3D => [
-      fastRound(coord[0] - halfField),
-      fastRound(coord[1] - halfField),
-      zLocation,
-    ],
-    [halfField, zLocation, fastRound]
+    (coord: Position2D): Position3D => [...toFieldScene(coord), zLocation],
+    [zLocation]
   )
 
   const positionChanged = React.useCallback(

@@ -3,7 +3,7 @@
  *    @function contactBorderObstacle Изменяет направление движение препятствий
  */
 import { obstacleContactProps } from '../../types/obstacleTypes'
-import { getField } from '../field/fieldPerLevel'
+import { isPlayableCell } from '../field/fieldGeometry'
 import { getObstaclesXCoord } from './obstaclesX'
 /**
  * При контакте с краем поля меняет направление движения препятствия
@@ -17,14 +17,9 @@ import { getObstaclesXCoord } from './obstaclesX'
 function contactBorderObstacle(props: obstacleContactProps): number {
   const { i, twist, coord, step } = props
 
-  if (coord[i][twist[0]] <= 1) {
-    step[i] = 1
-    coord[i][twist[0]] = 1 // исправление залипания на краю поля
-  }
-  if (coord[i][twist[0]] >= getField()) {
-    step[i] = -1
-    coord[i][twist[0]] = getField() // исправление залипания на краю поля
-  }
+  const next = [...coord[i]]
+  next[twist[0]] += step[i]
+  if (!isPlayableCell(next[0], next[1])) step[i] = -step[i]
 
   return step[i]
 }

@@ -1,3 +1,4 @@
+import { EATING_HEAD_HEIGHT, EATING_HEAD_RESPONSE } from '../bodyAnimations/snakeEatingLift'
 import { SnakeSteps } from '../../../types/animationTypes'
 import { getPositionHead, setPositionHead } from './snakeHeadProps'
 import { SystemConfig } from '../../../config/systemConfig'
@@ -22,8 +23,8 @@ export const snakeHeadMoving = (steps: SnakeSteps, delta: number) => {
 
   positionHead[0] += (currentStepX * moveSpeed) / SystemConfig.FPS
   positionHead[1] += (currentStepY * moveSpeed) / SystemConfig.FPS
-  const targetZ = currentStepZ > 0 ? 0.5 : 0
-  positionHead[2] = MathUtils.damp(positionHead[2], targetZ, 50, delta)
+  const targetZ = currentStepZ > 0 ? EATING_HEAD_HEIGHT : 0
+  positionHead[2] = MathUtils.damp(positionHead[2], targetZ, EATING_HEAD_RESPONSE * Math.max(1, moveSpeed), delta)
   if (counterHeadX === 0 && counterHeadY === 0) {
     positionHead[0] = Math.round(positionHead[0])
     positionHead[1] = Math.round(positionHead[1])

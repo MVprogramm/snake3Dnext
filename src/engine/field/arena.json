@@ -1,0 +1,12 @@
+{
+  "columns": 43,
+  "rows": 23,
+  "cellSize": 1,
+  "surface": {
+    "width": 44.5,
+    "depth": 24.68228,
+    "cornerCut": 1.9,
+    "scaleX": 0.988,
+    "scaleY": 0.9595
+  }
+}

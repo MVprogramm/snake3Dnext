@@ -1,4 +1,4 @@
-import { getField } from '../field/fieldPerLevel'
+import { getPlayableCells } from '../field/fieldGeometry'
 import { getAmountOfFood } from '../food/amountOfFoodPerLevel'
 import { getCurrentLevel } from '../levels/currentLevel'
 import { getObstaclesFixCoord } from '../obstacles/obstaclesFix'
@@ -58,7 +58,7 @@ function getSnakeGrowthProjection(): SnakeGrowthProjection | null {
 
   if (elapsedTime <= 0 || eatenCount === 0) return null
 
-  const fieldCells = getField() * getField()
+  const fieldCells = getPlayableCells().length
   const freeCells = Math.max(fieldCells - getOccupiedCellCount(), 1)
   const eatingSpeedPerMillisecond = eatenCount / elapsedTime
   const targetFoodInBonusWindow =

@@ -1,45 +1,32 @@
-/**
- * @module snakeBorderContactEvent.ts Управляет контактом змейки с краями поля
- *    @function snakeBorderContactEvent Останавливает или переносит змейку
- */
 import { SnakeHeadCoord } from '../../types/snakeTypes'
 import { getCrossesBorders } from '../bonuses/bonusSnakeCrossesBorders'
-import { getField } from '../field/fieldPerLevel'
+import { getBorderDestination, isPlayableCell } from '../field/fieldGeometry'
 import { isContact } from './isContact'
 import isCross from './isCross'
-import { getFoodEaten } from './snakeCatchesFoodEvent'
-/**
- * Срабатывает при контакте головы змейки с краем поля
- * @param snakeHead параметры головы змейки
- * @description
- *  1. если голова змейки выходит за пределы поля
- *  2. возвращает змейку к краю поля если бонус пересечения границ не работает
- *  3. переносит змейку на другой край поля, если бонус работает
- *  3. запускает соответствующую функцию создания события
- * @returns скорректированные при контакте с краем поля параметры головы змейки
- */
-function snakeBorderContactEvent(snakeHead: SnakeHeadCoord): SnakeHeadCoord {
-  let borderContact = false
-  if (snakeHead.snakeHeadCoordX < 1) {
-    snakeHead.snakeHeadCoordX = getCrossesBorders() ? getField() : 1
-    borderContact = true
-  }
-  if (snakeHead.snakeHeadCoordX > getField()) {
-    snakeHead.snakeHeadCoordX = getCrossesBorders() ? 1 : getField()
-    borderContact = true
-  }
-  if (snakeHead.snakeHeadCoordY < 1) {
-    snakeHead.snakeHeadCoordY = getCrossesBorders() ? getField() : 1
-    borderContact = true
-  }
-  if (snakeHead.snakeHeadCoordY > getField()) {
-    snakeHead.snakeHeadCoordY = getCrossesBorders() ? 1 : getField()
-    borderContact = true
-  }
-  if (borderContact)
-    snakeHead = getCrossesBorders() ? isCross(snakeHead) : isContact(snakeHead, 'border')
+import { getSnakeStepCells } from './snakeStepCollision'
 
-  return snakeHead
+function snakeBorderContactEvent(head: SnakeHeadCoord): SnakeHeadCoord {
+  let previous: [number, number] = [
+    head.snakeHeadCoordX - head.snakeHeadStepX,
+    head.snakeHeadCoordY - head.snakeHeadStepY,
+  ]
+  for (const [x, y] of getSnakeStepCells(head)) {
+    if (!isPlayableCell(x, y)) {
+      if (getCrossesBorders()) {
+        const destination = getBorderDestination(previous[0], previous[1], head.snakeHeadStepX, head.snakeHeadStepY)
+        if (destination) {
+          head.snakeHeadCoordX = destination[0]
+          head.snakeHeadCoordY = destination[1]
+          return isCross(head)
+        }
+      }
+      head.snakeHeadCoordX = previous[0]
+      head.snakeHeadCoordY = previous[1]
+      return isContact(head, 'border')
+    }
+    previous = [x, y]
+  }
+  return head
 }
 
 export default snakeBorderContactEvent

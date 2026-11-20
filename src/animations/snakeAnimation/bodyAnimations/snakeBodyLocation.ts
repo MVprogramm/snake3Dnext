@@ -1,5 +1,5 @@
 import { checkContact } from '../../../engine/events/isContact'
-import { getField } from '../../../engine/field/fieldPerLevel'
+import { getField, getFieldRows } from '../../../engine/field/fieldPerLevel'
 import { getProtocol } from '../../../engine/protocol/protocol'
 import { getSnakeHeadParams } from '../../../engine/snake/snake'
 import { checkTimerWorking } from '../../../engine/time/isTimer'
@@ -22,7 +22,7 @@ export const updateSnakeBodyLocation = () => {
 
   if (counterHeadX === 0 && counterHeadY === 0 && checkTimerWorking()) {
     const xCoord = snakeHeadCoordX - (getField() + 1) / 2
-    const yCoord = snakeHeadCoordY - (getField() + 1) / 2
+    const yCoord = snakeHeadCoordY - (getFieldRows() + 1) / 2
 
     let currentSnakeHeadStepX = snakeHeadStepX
     let currentSnakeHeadStepY = snakeHeadStepY

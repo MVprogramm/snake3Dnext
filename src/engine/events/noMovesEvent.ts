@@ -1,5 +1,5 @@
 import { SnakeHeadCoord } from '../../types/snakeTypes'
-import { getField } from '../field/fieldPerLevel'
+import { isPlayableCell } from '../field/fieldGeometry'
 import { getObstaclesFixCoord } from '../obstacles/obstaclesFix'
 import {
   getOscillatingStationaryX,
@@ -44,10 +44,7 @@ function noMoves(snakeHeadPos: SnakeHeadCoord): boolean {
       ;[checkSnakePos, contact] = snakeCoordCompare(checkSnakePos, pos, contact)
     })
     const outOfBounds =
-      checkSnakePos.snakeHeadCoordX < 1 ||
-      checkSnakePos.snakeHeadCoordX > getField() ||
-      checkSnakePos.snakeHeadCoordY < 1 ||
-      checkSnakePos.snakeHeadCoordY > getField()
+      !isPlayableCell(checkSnakePos.snakeHeadCoordX, checkSnakePos.snakeHeadCoordY)
     if (outOfBounds) {
       contact = true
     }

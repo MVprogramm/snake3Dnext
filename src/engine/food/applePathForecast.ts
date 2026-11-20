@@ -1,5 +1,5 @@
 import { Coordinate } from '../../types/obstacleTypes'
-import { getField } from '../field/fieldPerLevel'
+import { isPlayableCell } from '../field/fieldGeometry'
 import { getObstaclesFixCoord } from '../obstacles/obstaclesFix'
 import { getObstaclesXCoord } from '../obstacles/obstaclesX'
 import { getObstaclesYCoord } from '../obstacles/obstaclesY'
@@ -26,9 +26,7 @@ function getCellKey([x, y]: Coordinate): string {
 }
 
 function isInsideField([x, y]: Coordinate): boolean {
-  const fieldSize = getField()
-
-  return x >= 1 && x <= fieldSize && y >= 1 && y <= fieldSize
+  return isPlayableCell(x, y)
 }
 
 function getBlockedCells(start: Coordinate, target: Coordinate): Set<string> {

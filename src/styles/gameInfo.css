@@ -1,14 +1,61 @@
+.wrapper {
+  --game-control-offset: max(109px, calc(var(--game-info-clearance-bottom, 0px) + 53px));
+  --game-side-width: clamp(64px, 7vw, 96px);
+  --game-row-height: clamp(48px, 7vh, 80px);
+  --game-info-clearance-left: max(var(--game-side-width), calc(var(--arena-gap-left, 0px) + 1px));
+  --game-info-clearance-right: max(var(--game-side-width), calc(var(--arena-gap-right, 0px) + 1px));
+  --game-info-clearance-top: 0px;
+  --game-info-clearance-bottom: 0px;
+}
+
 .game-info {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
   color: #b8c6dc;
-  font-size: 3vmin;
+  font-size: clamp(11px, 1.5vmin, 16px);
   font-weight: 500;
-  padding: 2vmin 1vmin;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 1.5vmin;
-  /* z-index: 100; */
+  align-items: stretch;
+  gap: 0;
+  pointer-events: none;
 }
+
+.game-info-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(8px, 1.3vmin, 14px);
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  height: 100%;
+  justify-content: space-evenly;
+  padding: clamp(6px, 0.8vmin, 10px);
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 0;
+  background: #031631;
+}
+
+.game-info-group-left {
+  width: max(var(--game-side-width), calc(var(--arena-gap-left, 0px) + 1px));
+  border-right: 1px solid #55dfff40;
+}
+
+.game-info-group-right {
+  width: max(var(--game-side-width), calc(var(--arena-gap-right, 0px) + 1px));
+  border-left: 1px solid #55dfff40;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.game-info-group > i {
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
 
 .bonus-probability {
   color: #d32f2f;
@@ -16,7 +63,7 @@
   align-items: center;
   gap: 0.45vmin;
   min-width: 7ch;
-  font-size: 2.4vmin;
+  font-size: inherit;
   white-space: nowrap;
 }
 
@@ -39,4 +86,78 @@
   50% {
     opacity: 0.25;
   }
+}
+
+.wrapper[data-info-layout='horizontal'] {
+  --game-info-clearance-top: max(var(--game-row-height), calc(var(--arena-gap-top, 0px) + 1px));
+  --game-info-clearance-left: 0px;
+  --game-info-clearance-right: 0px;
+  --game-info-clearance-bottom: max(var(--game-row-height), calc(var(--arena-gap-bottom, 0px) + 1px));
+}
+
+.wrapper[data-info-layout='horizontal'] .game-info {
+  flex-direction: column;
+}
+
+.wrapper[data-info-layout='horizontal'] .game-info-group {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: clamp(4px, 1vw, 16px);
+  padding: 8px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left));
+  text-align: center;
+}
+
+.wrapper[data-info-layout='horizontal'] .game-info-group-left {
+  height: max(var(--game-row-height), calc(var(--arena-gap-top, 0px) + 1px));
+  padding-top: max(8px, env(safe-area-inset-top));
+  border-right: 0;
+  border-bottom: 1px solid #55dfff40;
+}
+
+.wrapper[data-info-layout='horizontal'] .game-info-group-right {
+  height: max(var(--game-row-height), calc(var(--arena-gap-bottom, 0px) + 1px));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  border-left: 0;
+  border-top: 1px solid #55dfff40;
+}
+
+/* Match the arena's portrait rotation, including text and indicator order. */
+.wrapper[data-info-rotated='true'] {
+  --game-control-offset: max(109px, calc(var(--game-info-clearance-left, 0px) + 53px));
+  --game-info-clearance-top: max(var(--game-side-width), calc(var(--arena-gap-left, 0px) + 1px));
+  --game-side-width: clamp(64px, 7vh, 96px);
+  --game-row-height: clamp(48px, 7vw, 80px);
+  --game-info-clearance-left: 0px;
+  --game-info-clearance-right: 0px;
+  --game-info-clearance-bottom: max(var(--game-side-width), calc(var(--arena-gap-right, 0px) + 1px));
+}
+
+.wrapper[data-info-rotated='true'] .game-info {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 100vh;
+  height: 100vw;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center;
+}
+
+.wrapper[data-info-rotated='true'][data-info-layout='horizontal'] {
+  --game-info-clearance-top: 0px;
+  --game-info-clearance-left: max(var(--game-row-height), calc(var(--arena-gap-bottom, 0px) + 1px));
+  --game-info-clearance-right: max(var(--game-row-height), calc(var(--arena-gap-top, 0px) + 1px));
+  --game-info-clearance-bottom: 0px;
+}
+
+.wrapper:not([data-view-mode='close-up']) .game-info {
+  display: none;
+}
+
+.wrapper.wrapper:not([data-view-mode='close-up']) {
+  --game-info-clearance-left: 0px;
+  --game-info-clearance-right: 0px;
+  --game-info-clearance-top: 0px;
+  --game-info-clearance-bottom: 0px;
 }

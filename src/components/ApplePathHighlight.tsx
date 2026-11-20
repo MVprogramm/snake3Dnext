@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { useState } from 'react'
-import { getField } from '../engine/field/fieldPerLevel'
+import { getField, getFieldRows } from '../engine/field/fieldPerLevel'
 import { getAppleTimeIdealPath } from '../engine/protocol/appleTimeEfficiency'
 import { isTrainingMode } from '../engine/training/trainingMode'
 import { Coordinate } from '../types/obstacleTypes'
@@ -17,7 +17,7 @@ function getCellKey([x, y]: Coordinate): string {
 function toScenePosition([x, y]: Coordinate, fieldSize: number): [number, number, number] {
   return [
     Math.round(x - fieldSize / 2) - 1,
-    Math.round(y - fieldSize / 2) - 1,
+    Math.round(y - getFieldRows() / 2) - 1,
     PATH_CELL_Z,
   ]
 }

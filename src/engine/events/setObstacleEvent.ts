@@ -6,7 +6,7 @@ import * as X from '../obstacles/obstaclesX'
 import * as Y from '../obstacles/obstaclesY'
 import * as FIX from '../obstacles/obstaclesFix'
 import getFreeCell from '../field/getFreeCell'
-import { getField } from '../field/fieldPerLevel'
+import { getField, getFieldRows } from '../field/fieldPerLevel'
 import cellsBookingAroundSnake from '../snake/cellsBookingAroundSnake'
 import selectionObstacleType from '../obstacles/selectionObstacleType'
 import { addEvent } from '../protocol/protocol'
@@ -44,7 +44,7 @@ function setObstacleEvent(): void {
     let booking: number[][] = []
     const snakeCoord = Math.round(getField() / 2)
     const fieldSize = getField()
-    booking = [...cellsBooking(snakeCoord, snakeCoord)]
+    booking = [...cellsBooking(snakeCoord, Math.round(getFieldRows() / 2))]
 
     // Отслеживание статистики размещения
     const placementStats = {

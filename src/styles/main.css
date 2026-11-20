@@ -39,8 +39,9 @@ body {
 
 .home-button {
   position: fixed;
-  bottom: 1.5vmin;
-  left: 1.5vmin;
+  bottom: var(--game-control-offset);
+  transform: translateY(50%);
+  left: calc(var(--game-info-clearance-left, 96px) + 24px);
   z-index: 40;
   display: inline-flex;
   align-items: center;
@@ -54,6 +55,14 @@ body {
   cursor: pointer;
   font: inherit;
   font-weight: 700;
+}
+
+.wrapper[data-info-rotated='true'] .home-button {
+  left: var(--game-control-offset);
+  top: calc(var(--game-info-clearance-top, 0px) + 24px);
+  bottom: auto;
+  transform: rotate(90deg) translateY(-50%);
+  transform-origin: top left;
 }
 
 .home-button:hover,

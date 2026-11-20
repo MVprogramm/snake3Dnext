@@ -1,3 +1,4 @@
+import { getEatingLiftHeights } from './snakeEatingLift'
 import { SnakeSteps } from '../../../types/animationTypes'
 import { getSnakeUnitPosition, setSnakeUnitPosition } from './snakeBodyProps'
 import { getDiff } from './snakeDiff'
@@ -6,8 +7,7 @@ import { getCounterHead, getHeadVerticalStep } from '../headAnimations/snakeHead
 import { SystemConfig } from '../../../config/systemConfig'
 import { getTimerStep } from '../../../engine/time/timerStepPerLevel'
 import { getFoodEaten } from '../../../engine/events/snakeCatchesFoodEvent'
-import { MathUtils } from 'three'
-import { getField } from '../../../engine/field/fieldPerLevel'
+import { getField, getFieldRows } from '../../../engine/field/fieldPerLevel'
 // import * as TURN from './snakeBodyTurnaround'
 // import { getSnakeBodyCoord } from '../../../engine/snake/snake'
 
@@ -63,15 +63,14 @@ export const snakeBodyMoving = (steps: SnakeSteps[], delta: number) => {
 
   // console.log(counterPauseDuring)
 
-  const pos = getSnakeUnitPosition().map((positions, index) => {
+  const previousPositions = getSnakeUnitPosition()
+  const liftHeights = getEatingLiftHeights(previousPositions.map(position => position[2]), diffZ > 0, moveSpeed, delta)
+  const pos = previousPositions.map((positions, index) => {
     const diff = getDiff()[index]
     positions[0] += (diff.diffX * moveSpeed) / SystemConfig.FPS
     positions[1] += (diff.diffY * moveSpeed) / SystemConfig.FPS
     // if (index === 0) positions[2] += (diffZ * moveSpeed) / SystemConfig.FPS / 1.3
-    if (index === 0) {
-      const targetZ = diffZ > 0 ? 0.5 : 0
-      positions[2] = MathUtils.damp(positions[2], targetZ, 5, delta)
-    }
+    positions[2] = liftHeights[index]
     /*-------------------------------------------------*/
     if (index != 0) {
       const perpX = -diff.diffY
@@ -91,9 +90,9 @@ export const snakeBodyMoving = (steps: SnakeSteps[], delta: number) => {
     const minBound = -fieldBoundary
     const maxBound = fieldBoundary
     positions[0] = Math.max(minBound, Math.min(maxBound, positions[0]))
-    positions[1] = Math.max(minBound, Math.min(maxBound, positions[1]))
+    const rowBoundary = (getFieldRows() - 1) / 2
+    positions[1] = Math.max(-rowBoundary, Math.min(rowBoundary, positions[1]))
 
-    if (index !== 0) positions[2] = 0
     if (getFoodEaten()) eatingTime = 0
     return positions
   })

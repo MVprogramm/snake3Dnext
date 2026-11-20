@@ -3,7 +3,7 @@
  *    @function startLevel Выполняет все процедуры по настройкам уровня
  */
 import { levelNotCompleted } from "../levels/isLevelComplete";
-import { getField } from "../field/fieldPerLevel";
+import { getField, getFieldRows } from "../field/fieldPerLevel";
 import setFood from "../food/setFood";
 import setSnakeStartEvent from "../events/setSnakeStartEvent";
 import setObstacleEvent from "../events/setObstacleEvent";
@@ -34,7 +34,7 @@ function startLevel(): void {
   closeSnakeMouthOnly();
   setSnakeStartEvent([
     Math.floor(getField() / 2) + 1,
-    Math.floor(getField() / 2) + 1,
+    Math.floor(getFieldRows() / 2) + 1,
   ]);
   setObstacleEvent();
   setFood(1);

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Material, Object3D } from 'three'
+import { Box3, Group, Material, Object3D, Vector3 } from 'three'
 import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { appleCONFIG } from '../config/appleConfig'
@@ -38,7 +38,7 @@ const Apple: React.FC = () => {
   }
 
   const [loadError, setLoadError] = React.useState<Error | null>(null)
-  const gltf = useGLTF('/apple.glb', undefined, undefined, (error) => {
+  const gltf = useGLTF('/green-apple.glb', undefined, undefined, (error) => {
     console.error('Ошибка загрузки модели яблока:', error)
     setLoadError(new Error('Не удалось загрузить модель яблока'))
   }) as GLTFResult
@@ -46,7 +46,16 @@ const Apple: React.FC = () => {
   const { position, updatePosition } = useApplePosition(zLocation)
   const [renderPosition, setRenderPosition] = React.useState<typeof position>(null)
   const appleScene = React.useMemo(() => {
-    const scene = gltf.scene.clone(true)
+    const model = gltf.scene.clone(true)
+    // Lay the Y-up apple axis along the field's Y axis; the leaf extends toward +X.
+    // Turning -90 degrees around Y lifts that leaf toward gameplay's +Z.
+    model.rotation.set(0, -Math.PI / 2, 0)
+    const bounds = new Box3().setFromObject(model)
+    const center = bounds.getCenter(new Vector3())
+    model.position.set(-center.x, -center.y, -bounds.min.z)
+    // Keep placement/visibility updates on a separate root so the resting pose persists.
+    const scene = new Group()
+    scene.add(model)
     scene.traverse((child: any) => {
       if (child.isMesh && child.material) {
         if (Array.isArray(child.material)) {
@@ -155,7 +164,7 @@ const Apple: React.FC = () => {
   }, [position, scale])
 
   React.useEffect(() => {
-    return () => useGLTF.clear('/apple.glb')
+    return () => useGLTF.clear('/green-apple.glb')
   }, [])
 
   // 🟥 Если произошла реальная ошибка — показываем её
@@ -170,6 +179,7 @@ const Apple: React.FC = () => {
 
   return (
     <primitive
+      name='game-apple'
       ref={counterRef}
       object={appleScene}
       position={renderPosition}
@@ -178,6 +188,6 @@ const Apple: React.FC = () => {
   )
 }
 
-useGLTF.preload('/apple.glb')
+useGLTF.preload('/green-apple.glb')
 
 export default React.memo(Apple)

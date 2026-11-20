@@ -1,50 +1,30 @@
 [
   {
-    "field": "11",
     "time": "100000",
     "timerStep": "1",
     "food": "5",
     "lives": "3",
-    "obstacles": ["x", "y", "fix-R", "fix-M"],
+    "obstacles": ["fix-M"],
     "bonuses": [],
     "fog": "light",
     "maxScores": "30"
   },
   {
-    "field": "21",
     "time": "60000",
     "timerStep": "1",
     "food": "5",
     "lives": "3",
-    "obstacles": [
-      "x",
-      "y",
-      "x",
-      "y",
-      "x",
-      "y",
-      "y",
-      "y",
-      "y",
-      "x",
-      "x",
-      "fix-R",
-      "fix-R",
-      "fix-R",
-      "fix-M",
-      "fix-M"
-    ],
+    "obstacles": ["fix-M", "fix-M"],
     "bonuses": [],
     "fog": "light",
     "maxScores": "35"
   },
   {
-    "field": "23",
     "time": "60000",
     "timerStep": "1",
     "food": "20",
     "lives": "30",
-    "obstacles": ["x", "y", "x", "y", "fix", "fix", "fix"],
+    "obstacles": ["fix", "fix", "fix"],
     "bonuses": [
       {
         "type": "snakeCrossesBorders",
@@ -63,12 +43,11 @@
     "maxScores": "40"
   },
   {
-    "field": "27",
     "time": "60000",
     "timerStep": "1",
     "food": "25",
     "lives": "3",
-    "obstacles": ["x", "y", "x", "y", "x", "y", "fix", "fix", "fix", "fix", "fix", "fix"],
+    "obstacles": ["fix", "fix", "fix", "fix", "fix", "fix"],
     "bonuses": [
       {
         "type": "addExtraScores",

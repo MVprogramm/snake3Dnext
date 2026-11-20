@@ -3,7 +3,7 @@
  *    @function setFoodEvent Каждая еда занимает отдельную свободную ячейку
  */
 import getFreeCell from '../field/getFreeCell'
-import { getField } from '../field/fieldPerLevel'
+import { isPlayableCell } from '../field/fieldGeometry'
 import { getCurrentFoodNumber } from '../food/currentFoodNumber'
 import { getAmountOfFood } from '../food/amountOfFoodPerLevel'
 import * as SNAKE from '../snake/snake'
@@ -16,7 +16,6 @@ import { startAppleTimeEfficiencyMeasurement } from '../protocol/appleTimeEffici
 
 function isAppleSpawnCellValid(cell: [number, number]): boolean {
   const [x, y] = cell
-  const fieldSize = getField()
   const fixedObstacles = new Set(
     getObstaclesFixCoord().map(([obstacleX, obstacleY]) => `${obstacleX}:${obstacleY}`)
   )
@@ -31,10 +30,7 @@ function isAppleSpawnCellValid(cell: [number, number]): boolean {
 
   for (const [neighborX, neighborY] of neighbors) {
     const isBorder =
-      neighborX < 1 ||
-      neighborX > fieldSize ||
-      neighborY < 1 ||
-      neighborY > fieldSize
+      !isPlayableCell(neighborX, neighborY)
 
     if (isBorder || fixedObstacles.has(`${neighborX}:${neighborY}`)) {
       blockedSides += 1

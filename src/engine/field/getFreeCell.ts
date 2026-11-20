@@ -2,7 +2,8 @@
  * @module getFreeCell.ts Рандомная генерация свободных ячеек
  *      @function getFreeCell Даёт координаты свободной ячейки
  */
-import { getField } from './fieldPerLevel'
+import { getField, getFieldRows } from './fieldPerLevel'
+import { isPlayableCell } from './fieldGeometry'
 
 type CellValidator = (cell: [number, number]) => boolean
 
@@ -17,7 +18,7 @@ const getFreeCell = (
   isValidCell: CellValidator = () => true,
 ): number[] | null => {
   const fieldSize = getField()
-  const totalCells = fieldSize * fieldSize
+  const totalCells = fieldSize * getFieldRows()
 
   const filteredBookedCells = bookedCells.filter(
     (coord): coord is [number, number] =>
@@ -27,7 +28,7 @@ const getFreeCell = (
       coord[0] > 0 &&
       coord[0] <= fieldSize &&
       coord[1] > 0 &&
-      coord[1] <= fieldSize
+      coord[1] <= getFieldRows()
   )
 
   const occupiedCells = new Set(
@@ -39,11 +40,11 @@ const getFreeCell = (
   const availableCells: [number, number][] = []
 
   for (let x = 1; x <= fieldSize; x += 1) {
-    for (let y = 1; y <= fieldSize; y += 1) {
+    for (let y = 1; y <= getFieldRows(); y += 1) {
       if (occupiedCells.has(`${x}:${y}`)) continue
 
       const candidateCell: [number, number] = [x, y]
-      if (isValidCell(candidateCell)) availableCells.push(candidateCell)
+      if (isPlayableCell(x, y) && isValidCell(candidateCell)) availableCells.push(candidateCell)
     }
   }
 

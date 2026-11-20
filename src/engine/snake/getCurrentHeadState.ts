@@ -4,7 +4,7 @@
  */
 import { getPositionHead } from '../../animations/snakeAnimation/headAnimations/snakeHeadProps'
 import { SnakeHeadCoord } from '../../types/snakeTypes'
-import { getField } from '../field/fieldPerLevel'
+import { getField, getFieldRows } from '../field/fieldPerLevel'
 import * as SNAKE from './snake'
 /**
  * Возвращает текущие координаты головы змейки в координатах сетки поля
@@ -18,7 +18,7 @@ export function getCurrentHeadState(): SnakeHeadCoord {
 
   return {
     snakeHeadCoordX: centerOffset + Math.round(positionX),
-    snakeHeadCoordY: centerOffset + Math.round(positionY),
+    snakeHeadCoordY: (getFieldRows() + 1) / 2 + Math.round(positionY),
     snakeHeadStepX,
     snakeHeadStepY,
   }

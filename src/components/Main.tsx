@@ -9,7 +9,7 @@
 // import { Wrapper } from './Wrapper'
 
 // import { useMenuStore } from '../store/menuStore'
-// import { cameraCONFIG } from '../config/cameraConfig'
+// import ArenaViewport from './ArenaViewport'
 
 // import '../styles/main.css'
 
@@ -58,18 +58,12 @@ import { Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping, SRGBColorSpace } from 'three'
 import { useMenuStore } from '../store/menuStore'
-import { cameraCONFIG } from '../config/cameraConfig'
+import ArenaViewport from './ArenaViewport'
 
-const LevaMonitor = lazy(() =>
-  import('./LevaMonitor').then((m) => ({ default: m.LevaMonitor })),
-)
 const Game = lazy(() => import('./Game').then((m) => ({ default: m.Game })))
 const Menu = lazy(() => import('./Menu'))
 const Wrapper = lazy(() => import('./Wrapper').then((m) => ({ default: m.Wrapper })))
-const TrainingPanel = lazy(() => import('./TrainingPanel'))
-const HomeButton = lazy(() => import('./HomeButton'))
 
-const isDev = process.env.NODE_ENV === 'development'
 
 const GL_SETTINGS = {
   antialias: true,
@@ -125,44 +119,15 @@ const Scene = () => (
 
 function Main() {
   const isVisible = useMenuStore((s) => s.isVisible)
-  const { far, near, fov, zoom } = cameraCONFIG
 
   return (
     <div className='main'>
       <Suspense fallback={<LoadingFallback text='Инициализация приложения...' />}>
         <Wrapper>
-          {isDev && (
-            <Suspense fallback={null}>
-              <LevaMonitor />
-            </Suspense>
-          )}
-
-          <Canvas
-            dpr={DPR_SETTINGS}
-            // dpr={[1, 2] as const}
-            shadows
-            gl={GL_SETTINGS}
-            camera={{ far, near, fov, zoom }}
-            fallback={<WebGLError />}
-            onCreated={({ gl }) => {
-              gl.toneMappingExposure = 1.0
-            }}
-          >
-            <Scene />
-          </Canvas>
-
-          <Suspense fallback={null}>
-            <TrainingPanel />
-          </Suspense>
-
-          {!isVisible && (
-            <Suspense fallback={null}>
-              <HomeButton />
-            </Suspense>
-          )}
+          <ArenaViewport />
 
           {isVisible && (
-            <Suspense fallback={<LoadingFallback text='Loading menu...' />}>
+            <Suspense fallback={<div className='menu-game'><LoadingFallback text='Loading menu...' /></div>}>
               <Menu />
             </Suspense>
           )}

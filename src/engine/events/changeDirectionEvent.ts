@@ -12,7 +12,7 @@ import { checkPause } from './pauseEvent'
 import { checkTimerWorking } from '../time/isTimer'
 import { checkContact } from './isContact'
 import { getSnakeHeadParams } from '../snake/snake'
-import { getField } from '../field/fieldPerLevel'
+import { isPlayableCell } from '../field/fieldGeometry'
 import { getObstaclesFixCoord } from '../obstacles/obstaclesFix'
 import { getObstaclesXCoord } from '../obstacles/obstaclesX'
 import { getObstaclesYCoord } from '../obstacles/obstaclesY'
@@ -56,10 +56,7 @@ function isDirectionAvailable(dirName: 'X' | 'Y', dirValue: 1 | -1): boolean {
   })
 
   const outOfBounds =
-    checkSnakePos.snakeHeadCoordX < 1 ||
-    checkSnakePos.snakeHeadCoordX > getField() ||
-    checkSnakePos.snakeHeadCoordY < 1 ||
-    checkSnakePos.snakeHeadCoordY > getField()
+    !isPlayableCell(checkSnakePos.snakeHeadCoordX, checkSnakePos.snakeHeadCoordY)
 
   return !contact && !outOfBounds
 }

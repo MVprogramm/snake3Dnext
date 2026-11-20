@@ -5,7 +5,7 @@ import { getAllObstacles } from '../engine/obstacles/getAllObstacles'
 import { useFrame } from '@react-three/fiber'
 import Hedgehog from '../assets/hedgehogModel/hedgehog'
 import Mushroom from '../assets/mushroomModel/Mushroom'
-import { getField } from '../engine/field/fieldPerLevel'
+import { getField, getFieldRows } from '../engine/field/fieldPerLevel'
 import { SystemConfig } from '../config/systemConfig'
 import { checkTimerWorking } from '../engine/time/isTimer'
 import moveObstacles from '../engine/obstacles/moveObstacles'
@@ -104,7 +104,7 @@ const Obstacles: React.FC = () => {
       // Читаем новые целевые позиции движка
       const updated = getAllObstacles()
       nextEngineX = updated.xCoord.map((c) => Math.round(c[0] - gridSize / 2) - 1)
-      nextEngineY = updated.yCoord.map((c) => Math.round(c[1] - gridSize / 2) - 1)
+      nextEngineY = updated.yCoord.map((c) => Math.round(c[1] - getFieldRows() / 2) - 1)
       // Обновляем направление ежей, сохраняя последнее ненулевое
       const newXSteps = updated.xStep.map((s, i) => {
         if (s !== 0) {
@@ -130,7 +130,7 @@ const Obstacles: React.FC = () => {
         (coord) =>
           new THREE.Vector3(
             Math.round(coord[0] - gridSize / 2) - 1,
-            Math.round(coord[1] - gridSize / 2) - 1,
+            Math.round(coord[1] - getFieldRows() / 2) - 1,
             0,
           ),
       )
@@ -138,7 +138,7 @@ const Obstacles: React.FC = () => {
         (coord) =>
           new THREE.Vector3(
             Math.round(coord[0] - gridSize / 2) - 1,
-            Math.round(coord[1] - gridSize / 2) - 1,
+            Math.round(coord[1] - getFieldRows() / 2) - 1,
             0,
           ),
       )
@@ -190,7 +190,7 @@ const Obstacles: React.FC = () => {
           const fixCoords = fixCoord[index]
           if (!fixCoords) return null
           const fx = Math.round(fixCoords[0] - gridSize / 2) - 1
-          const fy = Math.round(fixCoords[1] - gridSize / 2) - 1
+          const fy = Math.round(fixCoords[1] - getFieldRows() / 2) - 1
 
           // Определяем тип fix-препятствия из массива obstacles (fix / fix-M / fix-R)
           const allObstacleTypes = getObstacles()

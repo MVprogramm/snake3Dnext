@@ -1,0 +1,71 @@
+.training-arena {
+  position:relative;
+  width:100vw;
+  height:100vh;
+  background:#020712 url('/reference-arena.png') center/var(--reference-width, cover) var(--reference-height, cover) no-repeat;
+  background-position:calc(50% + var(--pan-x, 0px) + var(--camera-pan-x, 0px)) calc(50% + var(--pan-y, 0px) + var(--camera-pan-y, 0px));
+  overflow:hidden;
+}
+.training-arena.landscape-layout {
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:100vh;
+  height:100vw;
+  transform:translate(-50%,-50%) rotate(90deg);
+  transform-origin:center;
+}
+.training-arena canvas {
+  display:block;
+  touch-action:none;
+  cursor:grab;
+  position:absolute;
+  z-index:1;
+  left:0;
+  top:0;
+}
+.arena-pan-handle {
+  position:fixed;
+  z-index:30;
+  /* Reserve the full 56px handle travel plus a 24px screen-edge margin. */
+  right:max(80px, calc(var(--game-info-clearance-right, 0px) + 24px));
+  bottom:calc(var(--game-control-offset) - 29px);
+  width:58px;
+  height:58px;
+  box-sizing:border-box;
+  display:grid;
+  place-items:center;
+  padding:11px;
+  border:1px solid #55dfff;
+  border-radius:16px;
+  color:#47cfff;
+  background:rgba(3,22,49,.9);
+  box-shadow:0 0 18px #0bbaff99,inset 0 0 15px #0bbaff44;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  transform:translate(var(--handle-x, 0px),var(--handle-y, 0px));
+}
+.wrapper[data-info-rotated='true'] .arena-pan-handle {
+  left:calc(var(--game-control-offset) - 29px);
+  right:auto;
+  bottom:max(80px, calc(var(--game-info-clearance-bottom, 0px) + 24px));
+  transform:translate(var(--handle-x, 0px),var(--handle-y, 0px)) rotate(90deg);
+}
+.arena-pan-handle.is-panning { cursor:grabbing; }
+.arena-pan-handle[hidden] { display:none; }
+.arena-pan-handle:disabled { opacity:.5; cursor:default; }
+.arena-pan-handle svg { width:100%; height:100%; pointer-events:none; }
+.arena-pan-handle [data-control-icon] { grid-area:1 / 1; }
+.arena-pan-handle [data-control-icon='magnifier'],
+.arena-pan-handle [data-control-icon='close'] { display:none; }
+.arena-pan-handle[data-control-state='limit'] [data-control-icon='arrows'],
+.arena-pan-handle[data-control-state='close-up'] [data-control-icon='arrows'] { display:none; }
+.arena-pan-handle[data-control-state='limit'] [data-control-icon='magnifier'],
+.arena-pan-handle[data-control-state='close-up'] [data-control-icon='close'] { display:block; }
+.arena-pan-handle[data-control-state='close-up'] { cursor:pointer; }
+.arena-pan-handle [data-pan-direction].is-hidden { display:none; }
+.arena-pan-handle [data-scale-direction].is-hidden { display:none; }
+
+.training-arena .arena-canvas {position:absolute !important;inset:0;overflow:visible !important;}
+

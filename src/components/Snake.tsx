@@ -1,20 +1,14 @@
 import { createRef, RefObject, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import SnakeHead from '../assets/snakeModel/snakeHead/SnakeHead'
-import SnakeTail from '../assets/snakeModel/snakeTail/snakeTail'
+import SportSnakePart from '../assets/sportSnake/SportSnakePart'
 import React from 'react'
 import { snakeAnimation } from '../animations/snakeAnimation/snakeAnimation'
 import { getSnakeBodyCoord } from '../engine/snake/snake'
-import SnakeBodyUnit from '../assets/snakeModel/snakeBody/snakeBodyUnit'
 import { getAmountOfFood } from '../engine/food/amountOfFoodPerLevel'
 import * as U from '../animations/snakeAnimation/bodyAnimations/snakeBodyProps'
-import SnakeJaw from '../assets/snakeModel/snakeHead/snakeJaw/SnakeJaw'
-import { snakeHeadTurnaround } from '../animations/snakeAnimation/headAnimations/snakeHeadTurnaround'
-import { getNewMoveDirection } from '../engine/events/changeDirectionEvent'
-import checkTimerStep from '../engine/time/checkTimerStep'
-import { checkTimerWorking } from '../engine/time/isTimer'
-import { checkMistake } from '../engine/lives/isMistake'
+import { SmoothSnakeTrail } from '../animations/snakeAnimation/smoothSnakeTrail'
+import { getCurrentLevel } from '../engine/levels/currentLevel'
 
 /**
  * Компонент Snake рендерит 3D-модель змеи, состоящую из головы, тела и хвоста.
@@ -24,6 +18,8 @@ const Snake = () => {
   const [snakeCurrentLength, setSnakeCurrentLength] = useState(3)
   const snake = Array(snakeMaxLength).fill(1)
   const [snakeSeparate, setSnakeSeparate] = useState(Array(snakeMaxLength).fill(1))
+  const trail = useRef(new SmoothSnakeTrail())
+  const trailLevel = useRef(getCurrentLevel())
   const snakeRefs = useRef<{ [key: string]: RefObject<THREE.Group> }>({})
 
   const getVisibleSnakeUnits = (bodyLength: number, maxLength: number): number[] =>
@@ -52,72 +48,18 @@ const Snake = () => {
     if (snakeCurrentLength !== currentBodyLength) {
       setSnakeCurrentLength(currentBodyLength)
     }
-    for (const key in snakeRefs.current) {
-      if (Object.prototype.hasOwnProperty.call(snakeRefs.current, key)) {
-        if (key === 'headRef') {
-          snakeRefs.current['headRef'].current?.position.set(
-            U.getSnakeUnitPosition()[0][0],
-            U.getSnakeUnitPosition()[0][1],
-            U.getSnakeUnitPosition()[0][2],
-          )
-          // console.log('Snake', getIsDistraintContact())
-          let isStop = checkTimerStep() ? true : false
-          const shouldTurnOnForbiddenStop = !checkTimerWorking() && checkMistake()
-
-          let rotationZ = shouldTurnOnForbiddenStop
-            ? snakeHeadTurnaround(getNewMoveDirection())
-            : U.getSnakeUnitRotation()[0]?.[2]
-          // let rotationZ =
-          //   checkTimerWorking() && checkMistake()
-          //     ? snakeHeadTurnaround(getNewMoveDirection())
-          //     : U.getSnakeUnitRotation()[0]?.[2]
-
-          snakeRefs.current['headRef'].current?.rotation.set(0, 0, rotationZ)
-
-          if (isStop && rotationZ !== U.getSnakeUnitRotation()[0]?.[2]) {
-            rotationZ = U.getSnakeUnitRotation()[0]?.[2]
-            isStop = false
-          }
-          // console.log(rotationZ, U.getSnakeUnitRotation()[0]?.[2])
-        }
-        const index = Number(key.replace('bodyUnitRef_', ''))
-        if (key === 'tailRef') {
-          snakeRefs.current['tailRef'].current?.position.set(
-            U.getSnakeUnitPosition()[currentBodyLength - 2][0],
-            U.getSnakeUnitPosition()[currentBodyLength - 2][1],
-            U.getSnakeUnitPosition()[currentBodyLength - 2][2],
-          )
-          snakeRefs.current['tailRef'].current?.rotation.set(
-            0,
-            0,
-            U.getSnakeUnitRotation()[currentBodyLength - 2][2],
-          )
-          snakeRefs.current['tailRef'].current?.scale.set(
-            0.65 + 0.35 * (1 - (currentBodyLength - 2) / currentBodyLength),
-            0.65 + 0.35 * (1 - (currentBodyLength - 2) / currentBodyLength),
-            0.65 + 0.35 * (1 - (currentBodyLength - 2) / currentBodyLength),
-          )
-        }
-
-        if (key.includes('bodyUnitRef_')) {
-          if (index < currentBodyLength - 2) {
-            snakeRefs.current[`bodyUnitRef_${index}`].current?.position.set(
-              U.getSnakeUnitPosition()[index][0],
-              U.getSnakeUnitPosition()[index][1],
-              U.getSnakeUnitPosition()[index][2],
-            )
-            snakeRefs.current[`bodyUnitRef_${index}`].current?.rotation.set(
-              0,
-              0,
-              U.getSnakeUnitRotation()[index][2],
-            )
-            snakeRefs.current[`bodyUnitRef_${index}`].current?.scale.set(
-              0.65 + (0.35 * (currentBodyLength - index)) / currentBodyLength,
-              0.65 + (0.35 * (currentBodyLength - index)) / currentBodyLength,
-              0.65 + (0.35 * (currentBodyLength - index)) / currentBodyLength,
-            )
-          }
-        }
+    const level = getCurrentLevel()
+    const poses = trail.current.update(U.getSnakeUnitPosition(), currentBodyLength - 1, level !== trailLevel.current)
+    trailLevel.current = level
+    for (const [key, ref] of Object.entries(snakeRefs.current)) {
+      const index = key === 'headRef' ? 0 : key === 'tailRef' ? currentBodyLength - 2 : Number(key.replace('bodyUnitRef_', ''))
+      const pose = poses[index]
+      if (!ref.current || !pose) continue
+      ref.current.position.set(pose.x, pose.y, pose.z)
+      ref.current.rotation.set(pose.pitch, 0, pose.yaw, 'ZXY')
+      if (index > 0) {
+        const scale = .65 + .35 * (1 - index / currentBodyLength)
+        ref.current.scale.setScalar(scale)
       }
     }
   }, -20)
@@ -128,25 +70,21 @@ const Snake = () => {
         if (index === 0) {
           return (
             <group key={index} ref={headRef}>
-              <SnakeHead />
-              <SnakeJaw />
+              <SportSnakePart part='head' />
             </group>
           )
         } else if (index < snakeMaxLength - 1) {
           return (
             ref === 1 && (
               <group key={index} ref={getSnakeRef(`bodyUnitRef_${index}`)}>
-                <SnakeBodyUnit
-                  right={-(index % 2) * 1.57}
-                  left={3.14 - (index % 2) * 1.57}
-                />
+                <SportSnakePart part='body' />
               </group>
             )
           )
         } else if (index === snakeMaxLength - 1) {
           return (
             <group key={index} ref={tailRef}>
-              <SnakeTail />
+              <SportSnakePart part='tail' />
             </group>
           )
         } else {

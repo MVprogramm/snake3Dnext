@@ -1,3 +1,5 @@
+'use client'
+
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { signInWithEmail, signOut, signUpWithEmail } from '../services/authRepository'
 import { getSupabaseClient, isSupabaseConfigured } from '../services/supabaseClient'
@@ -6,12 +8,10 @@ export type AuthMode = 'sign-in' | 'sign-up'
 
 type AuthPanelProps = {
   embedded?: boolean
-  mode?: AuthMode
-  onModeChange?: (mode: AuthMode) => void
+  mode: AuthMode
 }
 
-function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: AuthPanelProps) {
-  const [localMode, setLocalMode] = useState<AuthMode>('sign-in')
+function AuthPanel({ embedded = false, mode }: AuthPanelProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -19,13 +19,6 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
   const [message, setMessage] = useState('')
   const [isBusy, setIsBusy] = useState(false)
   const isConfigured = isSupabaseConfigured()
-  const mode = controlledMode ?? localMode
-
-  function selectMode(nextMode: AuthMode) {
-    setLocalMode(nextMode)
-    onModeChange?.(nextMode)
-  }
-
   const canSubmit = useMemo(
     () => email.trim().length > 0 && password.length >= 6 && !isBusy,
     [email, password, isBusy],
@@ -72,10 +65,13 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
       return
     }
 
+    if (mode === 'sign-in') {
+      window.location.assign('/cabinet')
+      return
+    }
+
     setMessage(
-      mode === 'sign-in'
-        ? 'Вход выполнен'
-        : 'Регистрация создана. Проверьте email, если включено подтверждение.',
+      'Регистрация создана. Проверьте email, если включено подтверждение.',
     )
     setPassword('')
   }
@@ -107,6 +103,7 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
         onKeyDown={(event) => event.stopPropagation()}
       >
         <span className='auth-user-email'>{userEmail}</span>
+        <a className='auth-button auth-button-secondary auth-cabinet-link' href='/cabinet'>Кабинет</a>
         <button
           className='auth-button auth-button-secondary'
           type='button'
@@ -127,23 +124,6 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
       onClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => event.stopPropagation()}
     >
-      <div className='auth-tabs' role='tablist' aria-label='Режим авторизации'>
-        <button
-          className={mode === 'sign-in' ? 'auth-tab auth-tab-active' : 'auth-tab'}
-          type='button'
-          onClick={() => selectMode('sign-in')}
-        >
-          Вход
-        </button>
-        <button
-          className={mode === 'sign-up' ? 'auth-tab auth-tab-active' : 'auth-tab'}
-          type='button'
-          onClick={() => selectMode('sign-up')}
-        >
-          Регистрация
-        </button>
-      </div>
-
       <form className='auth-form' onSubmit={handleSubmit}>
         {mode === 'sign-up' && (
           <input
@@ -151,6 +131,7 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
             type='text'
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
+            aria-label='Имя игрока'
             placeholder='Имя игрока'
             autoComplete='nickname'
           />
@@ -160,6 +141,8 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
           type='email'
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          aria-label='Email'
+          required
           placeholder='Email'
           autoComplete='email'
         />
@@ -168,7 +151,10 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
           type='password'
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          placeholder='Пароль'
+          aria-label='Пароль'
+          required
+          minLength={6}
+          placeholder='Пароль (от 6 символов)'
           autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
         />
         <button className='auth-button' type='submit' disabled={!canSubmit}>
@@ -176,7 +162,7 @@ function AuthPanel({ embedded = false, mode: controlledMode, onModeChange }: Aut
         </button>
       </form>
 
-      {message && <p className='auth-message'>{message}</p>}
+      {message && <p className='auth-message' role='status'>{message}</p>}
     </aside>
   )
 }

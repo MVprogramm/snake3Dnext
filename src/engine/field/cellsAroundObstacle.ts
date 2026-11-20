@@ -1,3 +1,4 @@
+import { isPlayableCell } from './fieldGeometry'
 /**
  * @module cellsAroundObstacle.ts Резервирует ячейки вокруг препятствия
  */
@@ -23,7 +24,7 @@ export const cellsAroundObstacle = (
   for (let x = obstacleX - 1; x <= obstacleX + 1; x++) {
     for (let y = obstacleY - 1; y <= obstacleY + 1; y++) {
       // Проверяем границы поля (координаты 1-based)
-      if (x >= 1 && x <= fieldSize && y >= 1 && y <= fieldSize) {
+      if (isPlayableCell(x, y)) {
         reserved.push([x, y])
       }
     }

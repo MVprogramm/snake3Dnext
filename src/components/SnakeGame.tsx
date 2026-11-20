@@ -7,6 +7,7 @@ import setInitialLevelOfGame from '../engine/events/setInitialLevelOfGame'
 import { disableScrolling } from '../commands/disableScrolling'
 import { enableScrolling } from '../commands/enableScrolling'
 import { setTrainingMode, setTrainingSpeed } from '../engine/training/trainingMode'
+import { useMenuStore } from '../store/menuStore'
 
 type GameStatus = 'loading' | 'ready' | 'error'
 
@@ -15,7 +16,7 @@ function parseNumber(search: URLSearchParams, key: string, fallback: number): nu
   return Number.isFinite(value) ? value : fallback
 }
 
-export default function SnakeGame() {
+export default function SnakeGame({ autoStart = false }: { autoStart?: boolean }) {
   const [status, setStatus] = useState<GameStatus>('loading')
 
   useEffect(() => {
@@ -34,6 +35,9 @@ export default function SnakeGame() {
 
       setTrainingSpeed(trainingSpeed)
       disableScrolling()
+      if ((autoStart || search.has('play')) && useMenuStore.getState().isVisible) {
+        useMenuStore.getState().toggleModal()
+      }
       setStatus('ready')
     } catch (error) {
       console.error('Error initializing app:', error)
@@ -42,7 +46,7 @@ export default function SnakeGame() {
     }
 
     return () => enableScrolling()
-  }, [])
+  }, [autoStart])
 
   if (status === 'loading') return <div className='app-loading'>Инициализация игры...</div>
   if (status === 'error') return <ErrorScreen message='Не удалось инициализировать игру' />

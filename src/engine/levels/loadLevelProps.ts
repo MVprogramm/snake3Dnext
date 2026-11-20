@@ -5,7 +5,6 @@
 import levels from './levels.json'
 import { getTimer, setTimer } from '../time/timer'
 import { stopTimer } from '../time/isTimer'
-import { setField } from '../field/fieldPerLevel'
 import { setAmountOfFood } from '../food/amountOfFoodPerLevel'
 import { getTimePerLevel, setTimePerLevel } from '../time/timePerLevel'
 import { setTimerStep } from '../time/timerStepPerLevel'
@@ -23,7 +22,6 @@ import { setNewGame } from '../events/interruptGameEvent'
  * @description Задает настройки. Ставит игру на паузу.
  */
 function loadLevelProps(currentLevel: number) {
-  setField(+levels[currentLevel - 1].field)
   setAmountOfFood(+levels[currentLevel - 1].food)
   let extraTime = getTimePerLevel() ? getTimePerLevel() - getTimer() : 0
   setTimer(-getTimer())
