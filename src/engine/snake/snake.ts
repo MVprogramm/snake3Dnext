@@ -24,6 +24,17 @@ let snakeBody: SNAKE.SnakeBodyCoord = []
  */
 let previousSnakeBody: SNAKE.SnakeBodyCoord = []
 let stoppedSnakeDirection: [number, number] | null = null
+let contactDirection: [number, number] | null = null
+
+export function setContactDirection(x: number, y: number): void {
+  if (x !== 0 || y !== 0) contactDirection = [x, y]
+}
+export function clearContactDirection(): void {
+  contactDirection = null
+}
+export function isReverseAfterContact(x: number, y: number): boolean {
+  return contactDirection !== null && x === -contactDirection[0] && y === -contactDirection[1]
+}
 /**
  * Задает параметры головы змейки
  * @param snake Объект с параметрами головы змейки

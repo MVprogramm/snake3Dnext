@@ -7,6 +7,7 @@ import {
 } from '../obstacles/moveObstacles'
 import { getSnakeBlockingBodyForHead } from '../snake/getSnakeCollisionBody'
 import snakeCoordCompare from './snakeCoordCompare'
+import { isReverseAfterContact } from '../snake/snake'
 
 function getOscillatingStationaryObstacles(): number[][] {
   return getOscillatingStationaryX()
@@ -32,6 +33,7 @@ function noMoves(snakeHeadPos: SnakeHeadCoord): boolean {
   const availableDirections: { name: 'X' | 'Y'; value: 1 | -1 }[] = []
 
   directions.forEach(({ coord, name, value }) => {
+    if (isReverseAfterContact(coord[0], coord[1])) return
     checkSnakePos = {
       ...snakeHeadPos,
       snakeHeadCoordX: snakeHeadPos.snakeHeadCoordX + coord[0],

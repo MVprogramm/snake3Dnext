@@ -10,6 +10,7 @@ import { SnakeHeadCoord } from '../../types/snakeTypes'
 import { mistakeWasMade } from '../lives/isMistake'
 import protocolExecutor from '../protocol/protocolExecutor'
 import { setIsDistraintContact } from './allContactEvents'
+import { getStoppedSnakeDirection, setContactDirection } from '../snake/snake'
 
 /**
  *  Выполняет действия, связанные с запрещенным контактом головы змейки
@@ -25,6 +26,10 @@ import { setIsDistraintContact } from './allContactEvents'
 export function isContact(snakeHead: SnakeHeadCoord, mistake: string): SnakeHeadCoord {
   if (contact) return snakeHead
 
+  const direction = snakeHead.snakeHeadStepX !== 0 || snakeHead.snakeHeadStepY !== 0
+    ? [snakeHead.snakeHeadStepX, snakeHead.snakeHeadStepY]
+    : getStoppedSnakeDirection()
+  if (direction) setContactDirection(direction[0], direction[1])
   snakeHead.snakeHeadStepX = 0
   snakeHead.snakeHeadStepY = 0
   const coordX = snakeHead.snakeHeadCoordX

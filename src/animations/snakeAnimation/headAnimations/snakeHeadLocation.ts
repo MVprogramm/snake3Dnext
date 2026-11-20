@@ -24,6 +24,12 @@ let moveSpeed = 1
  * @var шаг движения головы змейки по вертикали
  */
 let headVerticalStep = 0
+export function resetHeadStepProgress(): void {
+  counterHeadX = 0
+  counterHeadY = 0
+  headVerticalStep = 0
+  moveSpeed = getTimerStep()
+}
 /**
  * Проверяет корректность объекта шагов змейки
  * @param steps - объект, хранящий текущие и предыдущие направления движения

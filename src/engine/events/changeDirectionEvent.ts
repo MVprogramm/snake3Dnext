@@ -11,11 +11,9 @@ import { getInterruptGame } from './interruptGameEvent'
 import { checkPause } from './pauseEvent'
 import { checkTimerWorking } from '../time/isTimer'
 import { checkContact } from './isContact'
-import { getSnakeHeadParams } from '../snake/snake'
+import { getSnakeHeadParams, isReverseAfterContact } from '../snake/snake'
 import { isPlayableCell } from '../field/fieldGeometry'
-import { getObstaclesFixCoord } from '../obstacles/obstaclesFix'
-import { getObstaclesXCoord } from '../obstacles/obstaclesX'
-import { getObstaclesYCoord } from '../obstacles/obstaclesY'
+import { getHighlightedObstacleCells } from '../obstacles/highlightedObstacleCells'
 import { getSnakeBlockingBodyForHead } from '../snake/getSnakeCollisionBody'
 import {
   hasPendingSnakeHead,
@@ -28,11 +26,7 @@ import snakeCoordCompare from './snakeCoordCompare'
  */
 function isDirectionAvailable(dirName: 'X' | 'Y', dirValue: 1 | -1): boolean {
   const snakeHead = getSnakeHeadParams()
-  const obstacles = [
-    ...getObstaclesFixCoord(),
-    ...getObstaclesXCoord(),
-    ...getObstaclesYCoord(),
-  ]
+  const obstacles = getHighlightedObstacleCells()
   const prohibitedCells = obstacles.concat(getSnakeBlockingBodyForHead())
 
   let coord = [0, 0]
@@ -86,6 +80,13 @@ export const getNewMoveDirection = (): string => newMoveDirection
  * @returns событие изменения направления движения змейки, или "пустое" событие
  */
 export const changeDirectionEvent = (e: KeyboardEvent): Event => {
+  const requested: Record<string, [number, number]> = {
+    ArrowUp: [0, 1], ArrowDown: [0, -1], ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+  }
+  const direction = requested[e.code]
+  if (direction && isReverseAfterContact(direction[0], direction[1])) {
+    return { name: '', value: 0 }
+  }
   const moveDirection = findLastMoveDirection()
 
   let newName = ''

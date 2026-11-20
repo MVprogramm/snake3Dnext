@@ -9,6 +9,7 @@ import { getAmountOfFood } from '../engine/food/amountOfFoodPerLevel'
 import * as U from '../animations/snakeAnimation/bodyAnimations/snakeBodyProps'
 import { SmoothSnakeTrail } from '../animations/snakeAnimation/smoothSnakeTrail'
 import { getCurrentLevel } from '../engine/levels/currentLevel'
+import { checkHighlightedHeadContact } from '../engine/events/highlightedHeadContact'
 
 /**
  * Компонент Snake рендерит 3D-модель змеи, состоящую из головы, тела и хвоста.
@@ -41,6 +42,7 @@ const Snake = () => {
 
   useFrame((_, delta) => {
     snakeAnimation(delta)
+    const obstacleContact = checkHighlightedHeadContact()
     const currentBodyLength = getSnakeBodyCoord().length
     const updatedSnake = getVisibleSnakeUnits(currentBodyLength, snakeMaxLength)
 
@@ -49,7 +51,7 @@ const Snake = () => {
       setSnakeCurrentLength(currentBodyLength)
     }
     const level = getCurrentLevel()
-    const poses = trail.current.update(U.getSnakeUnitPosition(), currentBodyLength - 1, level !== trailLevel.current)
+    const poses = trail.current.update(U.getSnakeUnitPosition(), currentBodyLength - 1, obstacleContact || level !== trailLevel.current)
     trailLevel.current = level
     for (const [key, ref] of Object.entries(snakeRefs.current)) {
       const index = key === 'headRef' ? 0 : key === 'tailRef' ? currentBodyLength - 2 : Number(key.replace('bodyUnitRef_', ''))

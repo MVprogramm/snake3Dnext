@@ -56,6 +56,7 @@ export function advanceSnake(): void {
       clearPendingSnakeHead()
     } else {
       setPendingSnakeHead(potentialHead)
+      SNAKE.clearContactDirection()
       nextBodyHeadX = potentialHead.snakeHeadCoordX
       nextBodyHeadY = potentialHead.snakeHeadCoordY
     }

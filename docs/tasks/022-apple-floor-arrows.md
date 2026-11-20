@@ -23,6 +23,11 @@ playable adjacent cells. The arrows belong to the game plane, so perspective,
 zoom, camera following and screen rotation apply naturally. Depth testing keeps
 them painted on the floor rather than overlaid on snake models.
 
+Hide an arrow in the single cell between the head and an obstacle two cells away
+along that neighbour direction. Also hide it if the neighbour itself is occupied.
+Use current fixed/X/Y obstacle coordinates each frame; leave the other arrow
+unchanged and restore the hidden one when the gap clears. Do not relocate it.
+
 Keep the unused prior formatter and its check script on disk. Preserve the
 existing training-path highlight and other scene modules.
 

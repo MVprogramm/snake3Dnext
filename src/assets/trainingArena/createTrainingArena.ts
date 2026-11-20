@@ -8,11 +8,7 @@ import { getSnakeUnitPosition } from "../../animations/snakeAnimation/bodyAnimat
 import { getCurrentLevel } from "../../engine/levels/currentLevel";
 import { FollowingCamera } from "./followingCamera";
 import { cropCameraToViewport } from "./viewportCamera";
-import { getFoodCoord } from "../../engine/food/food";
-import { howMuchIsLeftToEat } from "../../engine/food/currentFoodNumber";
-import { createAppleArrows, getAnimatedFoodOffset } from "./appleArrows";
-import { getSnakeHeadParams } from "../../engine/snake/snake";
-import { createCameraVisibilityCheck } from "./cameraVisibility";
+import { createScreenRoundCorrection } from "../obstacleSymbols/screenRoundSymbols";
 export function createTrainingArena(renderer, camera, mount, panHandle) {
 const scene=new THREE.Scene();
 const controller=new AbortController();
@@ -1162,8 +1158,6 @@ gamePlane.position.y += .025;
 gamePlane.rotation.x=-Math.PI/2;
 fieldPivot.add(gamePlane);
 gamePlane.add(gameplay);
-const appleArrows=createAppleArrows();
-gamePlane.add(appleArrows.group);
 // Preserve the unlit field texture while allowing real model shadows over it.
 const shadowSurface = new THREE.Mesh(fieldGeo.clone(), new THREE.ShadowMaterial({
   color: 0x001016, opacity: .48, transparent: true,
@@ -1199,8 +1193,7 @@ let previousMountWidth=0, previousMountHeight=0;
 const rendererSize = new THREE.Vector2();
 const following = new FollowingCamera();
 const viewportCamera = new THREE.PerspectiveCamera();
-const isInCameraView=createCameraVisibilityCheck();
-let appleObject;
+const correctRoundSymbols=createScreenRoundCorrection();
 const fieldOutline = Array.from({length:fieldPos.count},()=>new THREE.Vector3());
 const headWorld = new THREE.Vector3();
 const fieldCentre = new THREE.Vector3();
@@ -1265,12 +1258,7 @@ return {
    const imagePanY=pan.y+REFERENCE_OBJECTS_OFFSET_Y*expectedSize.height/REFERENCE_HEIGHT;
    cropCameraToViewport(viewportCamera,activeCamera,expectedSize.width,expectedSize.height,
      mountWidth,mountHeight,pan.x,imagePanY);
-   if(!appleObject?.parent)appleObject=gameplay.getObjectByName('game-apple');
-   const appleInView=closeUpMode && isInCameraView(appleObject,viewportCamera);
-   const headCell=getSnakeHeadParams();
-   appleArrows.group.scale.setScalar(fieldSettings.cellSize);
-   appleArrows.update(head,headCell?[headCell.snakeHeadCoordX,headCell.snakeHeadCoordY]:undefined,
-     howMuchIsLeftToEat()>0?getAnimatedFoodOffset(head,getFoodCoord()):null,closeUpMode && !appleInView);
+   correctRoundSymbols(gameplay,viewportCamera,mountWidth,mountHeight);
    // Preserve the old canvas boundary when the reference image is smaller than
    // the screen, without allocating pixels for its offscreen portion.
    const left=Math.max(0,(mountWidth-expectedSize.width)/2+pan.x);

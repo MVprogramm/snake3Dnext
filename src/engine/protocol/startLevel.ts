@@ -10,8 +10,9 @@ import setObstacleEvent from "../events/setObstacleEvent";
 import { obstacleSpeedReset } from "../obstacles/obstacleSpeed";
 import { removeBonus } from "../bonuses/bonusAvailableState";
 import { catchBonus } from "../bonuses/bonusCatchingState";
-import { clearStoppedSnakeDirection } from "../snake/snake";
+import { clearStoppedSnakeDirection, clearContactDirection } from "../snake/snake";
 import { clearPendingSnakeHead } from "../snake/snakeStepPhase";
+import { resetHighlightedObstacleCells } from '../obstacles/highlightedObstacleCells';
 import { resetExtraTimeBonusProbabilityLaunch } from "../bonuses/extraTimeBonusProbability";
 import { resetExtraLifeBonusProbabilityLaunch } from "../bonuses/extraLifeBonusProbability";
 import { resetStopsGrowingBonusProbabilityLaunch } from "../bonuses/snakeStopsGrowingBonusProbability";
@@ -30,7 +31,9 @@ function startLevel(): void {
   stopTimer();
   resetNewMoveDirection();
   clearStoppedSnakeDirection();
+  clearContactDirection();
   clearPendingSnakeHead();
+  resetHighlightedObstacleCells();
   closeSnakeMouthOnly();
   setSnakeStartEvent([
     Math.floor(getField() / 2) + 1,

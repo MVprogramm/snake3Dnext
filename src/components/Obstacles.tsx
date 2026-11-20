@@ -1,15 +1,16 @@
-import { getObstacles } from '../engine/obstacles/obstaclesPerLevel'
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { getAllObstacles } from '../engine/obstacles/getAllObstacles'
 import { useFrame } from '@react-three/fiber'
-import Hedgehog from '../assets/hedgehogModel/hedgehog'
-import Mushroom from '../assets/mushroomModel/Mushroom'
+import MovingObstacleSymbol from '../assets/obstacleSymbols/MovingObstacleSymbol'
+import FixedObstacleSymbol from '../assets/obstacleSymbols/FixedObstacleSymbol'
+import ObstacleCellFrame from '../assets/obstacleSymbols/ObstacleCellFrame'
+import ObstacleTracks from '../assets/obstacleSymbols/ObstacleTracks'
+import { getMovingHighlightedCells, resetHighlightedObstacleCells, setMovingObstacleVisualPositions } from '../engine/obstacles/highlightedObstacleCells'
 import { getField, getFieldRows } from '../engine/field/fieldPerLevel'
 import { SystemConfig } from '../config/systemConfig'
 import { checkTimerWorking } from '../engine/time/isTimer'
 import moveObstacles from '../engine/obstacles/moveObstacles'
-import Rock from '../assets/rockModel/Rock'
 import { checkMistake } from '../engine/lives/isMistake'
 import { getCurrentLevel } from '../engine/levels/currentLevel'
 import { updateAppleTimeIdealRoute } from '../engine/protocol/appleTimeEfficiency'
@@ -43,8 +44,14 @@ const Obstacles: React.FC = () => {
   const [yStepState, setYStepState] = useState<number[]>(yStep)
 
   const obstaclesRefs = useRef<Record<string, React.RefObject<THREE.Group>>>({})
+  const frameRefs = useRef<Record<string, React.RefObject<THREE.Group>>>({})
   const lastXStep = useRef<number[]>([...xStep])
   const lastYStep = useRef<number[]>([...yStep])
+
+  useEffect(() => {
+    resetObstacleRenderState()
+    return () => resetHighlightedObstacleCells()
+  }, [])
 
   useEffect(() => {
     renderLevelRef.current = renderLevel
@@ -60,6 +67,7 @@ const Obstacles: React.FC = () => {
     const key = `x_${i}`
     if (!obstaclesRefs.current[key])
       obstaclesRefs.current[key] = React.createRef<THREE.Group>()
+    if (!frameRefs.current[key]) frameRefs.current[key] = React.createRef<THREE.Group>()
   }
 
   const yCount = yCoord.length
@@ -67,6 +75,7 @@ const Obstacles: React.FC = () => {
     const key = `y_${i}`
     if (!obstaclesRefs.current[key])
       obstaclesRefs.current[key] = React.createRef<THREE.Group>()
+    if (!frameRefs.current[key]) frameRefs.current[key] = React.createRef<THREE.Group>()
   }
 
   const fixCount = fixCoord.length
@@ -81,6 +90,8 @@ const Obstacles: React.FC = () => {
     if (renderLevelRef.current !== currentLevel) {
       resetObstacleRenderState()
       obstaclesRefs.current = {}
+      frameRefs.current = {}
+      resetHighlightedObstacleCells()
       renderLevelRef.current = currentLevel
       setRenderLevel(currentLevel)
       return
@@ -88,6 +99,18 @@ const Obstacles: React.FC = () => {
 
     const shouldAnimateObstacles = checkTimerWorking() || checkMistake()
     const forceMoveByMistake = !checkTimerWorking() && checkMistake()
+    const live=getAllObstacles()
+    if(counter!==-1 && (threeCoordX.length!==live.xCoord.length || threeCoordY.length!==live.yCoord.length)){
+      resetObstacleRenderState()
+      resetHighlightedObstacleCells()
+      for(const key of Object.keys(obstaclesRefs.current)){
+        const [axis,index]=key.split('_')
+        const count=axis==='x'?live.xCoord.length:axis==='y'?live.yCoord.length:live.fixCoord.length
+        if(+index>=count){delete obstaclesRefs.current[key];delete frameRefs.current[key]}
+      }
+      setXStepState([...live.xStep]);setYStepState([...live.yStep])
+      return
+    }
     // 1. Тик: запускаем движок на границе периода (до инициализации, чтобы в первом кадре не срабатывало)
     if (counter === 0 && shouldAnimateObstacles) {
       // Сохраняем текущие экранные позиции как начало интерполяции
@@ -150,12 +173,12 @@ const Obstacles: React.FC = () => {
     }
 
     // 3. Продвигаем счётчик
-    counter += 1 / SystemConfig.FPS
+    if (shouldAnimateObstacles) counter += 1 / SystemConfig.FPS
     const tickProgress = counter // захватываем до сброса
     if (shouldAnimateObstacles && counter >= 1) counter = 0
 
     // 4. Плавная интерполяция prevVisual → nextEngine
-    if (threeCoordX.length > 0) {
+    {
       const t = Math.min(tickProgress, 1)
       threeCoordX.forEach((vec, i) => {
         if (prevVisualX[i] !== undefined && nextEngineX[i] !== undefined)
@@ -167,6 +190,10 @@ const Obstacles: React.FC = () => {
       })
     }
 
+    const centreX=(gridSize+1)/2, centreY=(getFieldRows()+1)/2
+    setMovingObstacleVisualPositions('x',threeCoordX.map(vec=>[vec.x+centreX,vec.y+centreY]))
+    setMovingObstacleVisualPositions('y',threeCoordY.map(vec=>[vec.x+centreX,vec.y+centreY]))
+    const activeX=getMovingHighlightedCells('x'), activeY=getMovingHighlightedCells('y')
     // 5. Передаём позиции в рефы
     Object.entries(obstaclesRefs.current).forEach(([key, ref]) => {
       const [obsType, indexStr] = key.split('_')
@@ -175,11 +202,14 @@ const Obstacles: React.FC = () => {
       const vec = obsType === 'x' ? threeCoordX[index] : threeCoordY[index]
       if (!vec) return
       ref.current?.position.set(vec.x, vec.y, 0)
+      const cell=(obsType==='x'?activeX:activeY)[index]
+      if(cell)frameRefs.current[key]?.current?.position.set(cell[0]-centreX,cell[1]-centreY,0)
     })
-  })
+  }, -110)
 
   return (
     <>
+      <ObstacleTracks rows={xCoord.map(coord => coord[1])} columns={yCoord.map(coord => coord[0])} />
       {Object.entries(obstaclesRefs.current || {}).map(([key, ref]) => {
         const [obsType, indexStr] = key.split('_')
         const index = parseInt(indexStr, 10)
@@ -192,33 +222,22 @@ const Obstacles: React.FC = () => {
           const fx = Math.round(fixCoords[0] - gridSize / 2) - 1
           const fy = Math.round(fixCoords[1] - getFieldRows() / 2) - 1
 
-          // Определяем тип fix-препятствия из массива obstacles (fix / fix-M / fix-R)
-          const allObstacleTypes = getObstacles()
-          const fixTypes = allObstacleTypes.filter((o) => o.substring(0, 3) === 'fix')
-          const obstacleType = fixTypes[index] ?? 'fix'
-          const isMushroom = obstacleType === 'fix-M' || obstacleType === 'fix'
-          const isRock = obstacleType === 'fix-R'
-
-          if (isMushroom) {
-            return (
-              <group key={key} position={[fx, fy, 0]} scale={[0.06, 0.06, 0.06]}>
-                <Mushroom seed={index + 1000} />
-              </group>
-            )
-          }
-          if (isRock) {
-            return (
-              <group key={key} position={[fx, fy, -0.3]} scale={[1.3, 1.3, 1.3]}>
-                <Rock seed={index + 1000} />
-              </group>
-            )
-          }
+          return (
+            <group key={key} position={[fx, fy, 0]}>
+              <FixedObstacleSymbol />
+            </group>
+          )
         }
 
         // Ежи — движущиеся препятствия (x, y)
         return (
-          <group key={key} ref={ref} scale={[0.65, 0.65, 0.65]}>
-            <Hedgehog direction={directionArray} index={index} line={obsType} />
+          <group key={key}>
+            <group ref={frameRefs.current[key]}>
+              <ObstacleCellFrame color='#2470ff' />
+            </group>
+            <group ref={ref}>
+              <MovingObstacleSymbol axis={obsType === 'x' ? 'x' : 'y'} direction={directionArray[index] ?? 1} />
+            </group>
           </group>
         )
       })}

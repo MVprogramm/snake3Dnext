@@ -15,6 +15,10 @@ type positionCounter = {
 let counter = 0
 let moveSpeed = 1
 const FPS = 60
+export function resetSnakePositionCounter(): void {
+  counter = 0
+  moveSpeed = getTimerStep()
+}
 /**
  * Контролирует количество шагов головы 3D змейки по X и Y,
  * ограничивая их пределами межклеточного расстояния.
